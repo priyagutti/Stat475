@@ -1,0 +1,207 @@
+---
+title: "Stat475HW1"
+output:
+  pdf_document: default
+  html_document: default
+date: '2022-09-12'
+---
+
+1. 
+  n, the number of rows in X: 6
+  p, the number of columns in X: 7
+2.
+X32: 0
+3. 
+
+```{r}
+library(base)
+library(dplyr)
+library(GGally)
+library(tidyverse)
+data <- data.frame(r1 = c(2, -1, 6, -2, 5, 1 ,6), r2 = c(5,1,9,1,8,5,8),r3=c(1,0,0,0,4,1,2),r4=c(3,-3,-3,-7,3,4,-3),r5=c(0,2,4,2,-9,-2,6),r6=c(6,-3,13,3,5,-2,0))
+X<- data.matrix(data)
+X
+J <-colMeans(X)
+mean(J)
+```
+4. 
+S is the sample covariance matrix. 
+```{r}
+S<-cov(data)
+S
+```
+
+```
+5.
+```{r}
+R<-cor(data)
+R
+```
+
+6. 
+```{r}
+Xt<- t(X)
+Xt
+```
+
+7.
+```{r}
+
+Z<- scale(X)
+Z
+```
+
+8. The covariance matrix of X (R) has the same values as the covariance matrix for Z. 
+```{r}
+R
+cov(Z)
+```
+Q2
+1. The sample mean vector is 27.85
+```{r}
+p <- read.csv("C:/Users/priya/Downloads/liver_enzymes.csv")
+p
+
+p2 <- p[,c(2,3,4)]
+p2
+X2 <-colMeans(p2)
+X2
+mean(X)
+```
+
+2.
+```{r}
+S2 <- cov(p2)
+S2
+```
+
+3.
+```{r}
+R2<-cor(p2)
+R2
+```
+
+4.The pairwise relationship seem to be weak linear positive relationships between the variables. 
+```{r}
+pairs(p2)
+```
+
+5.The generalized sample variance shows if the variables have little or strong correlation between them. If the value is large, that means there is very little correlation between the variables. The generalized sample variance shows the measure of magnitude of how much the variables "vary" with eachother.
+```{r}
+det(cov(p2))
+```
+
+6. The total variance is 419.8333. The total variance ignores the correlation between the variables. 
+```{r}
+a <- sapply(p2, var)
+a
+sum(a)
+```
+Q3
+1.
+```{r}
+
+df<- read.csv("C:/Users/priya/Downloads/cereal.csv")
+df["manufacturer"][df["manufacturer"] == "N"] <- "Nabisco"
+df["manufacturer"][df["manufacturer"] == "P"] <- "Post"
+df["manufacturer"][df["manufacturer"] == "Q"] <- "Quaker Oats"
+df["manufacturer"][df["manufacturer"] == "R"] <- "Ralston Purina"
+df["manufacturer"][df["manufacturer"] == "A"] <- "American Home Food Products"
+df["manufacturer"][df["manufacturer"] == "G"] <- "General Mills"
+df["manufacturer"][df["manufacturer"] == "K"] <- "Kelloggs"
+tab <- table(df$manufacturer)
+tab
+View(df)
+
+```
+
+2.There are 9 cereals for which information is missing and the proportion of missing values is 0.117.
+```{r}
+c <- df %>% filter(cups < 0)
+c <- count(c)
+c
+c/77
+
+df <- df %>% filter(cups > 0)
+head(df)
+View(df)
+```
+
+3.
+
+
+
+
+
+```{r}
+df <- transform(df,calories= calories/cups)
+df <- transform(df,protein= protein/cups)
+df <- transform(df,sodium= sodium/cups)
+df <- transform(df,fat= fat/cups)
+df <- transform(df,carbs= carbs/cups)
+df <- transform(df,sugar= sugar/cups)
+df <- transform(df,vitamins= vitamins/cups)
+df <- transform(df,potassium= potassium/cups)
+df <- transform(df,fiber= fiber/cups)
+```
+
+4.
+a. 7040 is the maximum and 32.59 is the lowest per cup. 
+```{r}
+max(df$calories)
+min(df$calories)
+```
+
+b. Max for vitamins is 133.33 and the minumum is 0. 
+```{r}
+max(df$vitamins)
+min(df$vitamins)
+View(df)
+```
+
+c.
+The most linearly associated variables is pottasium and fiber. Potassium and fiber has about three outliers on the top right. The graphs with the variable, calories, seem to not be linear at all and there isn't ay correlation between calories and any of the variables. For every graph, there seems to be a couple of outliers even though there isn't the best linearity between the variables. 
+```{r}
+dfsub <- subset(df, select = c(calories,carbs,fat,fiber,sodium,potassium))
+pairs(dfsub, pch = 25)
+```
+
+d.There seems to be a larger range on the top shelf for sugar content and is skewed to the left a bit. The second shelf has more outliers but is between the range of approximately 9 and 15 and isn't a normal distribution. The 1st shelf is skewed to the right and the mean is between 0 and 5. 2nd shelf has a mean between 10 and 15 and is close to the mean of the 3rd shelf. 
+```{r}
+boxplot(df$sugar ~ df$shelf)
+```
+
+(e) The 1st shelf boxplot looks like a normal distrbution and is int the range of 0 to approximately 8. Shelf 2 is has 3 outliers and is in the range of 0 to below 10. The third shelf has a more spread out distribution but has outliers between 25 and 30. 
+```{r}
+boxplot(df$fiber ~ df$shelf)
+```
+
+f.
+```{r}
+
+dfsub2 <- subset(df, select = c(calories,carbs,fat,fiber,sodium,potassium,protein,sugar,vitamins,shelf))
+
+ggparcoord(data = dfsub2, groupColumn = "shelf")
+```
+
+
+.g. From the information in the first boxplot, Kellogs have a larger range in calories than General Mills and General Mills would be considered to be healthier in calories wise since it is between 0 to 400 not including the three outlier that range from 750 to 1100. Kellogs has two outliers and its maximum is close to 2000. For the second graph, general mills seems to have more fat compared to kellogs even tho the calories are pretty low. Kellogs, on the other hand, has 5 different cereals that has 0 fat. With the third graph, Kellogs has two outliers that are high in vitamins and general mills has one that is quite high. General MIlls has a normal distribution while Kelloggs is right skewed. 
+
+```{r}
+dfsubset3 <- df %>% filter(manufacturer == "Kelloggs" | manufacturer == "General Mills")
+ggplot(data = dfsubset3, mapping = aes(x = manufacturer, y = calories)) +
+    geom_boxplot()
+    
+ggplot(dfsubset3, aes(x=calories, y=fat, color=manufacturer)) + geom_point()
+
+
+ggplot(data = dfsubset3, mapping = aes(x = manufacturer, y = vitamins)) +
+    geom_boxplot()
+```
+
+
+
+
+
+
+

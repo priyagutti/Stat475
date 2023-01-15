@@ -1,0 +1,101 @@
+---
+title: "Lab3"
+output: html_document
+date: '2022-09-08'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+Music data set 
+```{r}
+music <- read.csv('/Users/priya/Stat475/music-plusnew-sub.csv', row.names=1, stringsAsFactors=FALSE)
+dim(music)
+colnames(music)
+head(music)
+summary(music)
+table(music$Type)
+table(music$Artist)
+```
+body fat data set
+```{r}
+bodyfat <- read.csv('/Users/priya/Stat475/bodyfat.csv')
+dim(bodyfat)
+colnames(bodyfat)
+head(bodyfat)
+```
+Pisa math means data set
+```{r}
+pisamath <-read.csv('/Users/priya/Stat475/pisamathmeans.csv')
+dim(pisamath)
+summary(pisamath)
+```
+Software
+```{r}
+library(ggplot2)
+library(GGally)
+```
+Exercise 1 Music clips data
+```{r}
+table(music$Type)
+music.sub <- subset(music, Type == "Rock" | Type == "Classical")
+qplot(LAve, data=music.sub, geom="histogram", binwidth=10.0) + facet_wrap(~Type, ncol=1)
+```
+
+A) The classical histogram is skewed to the right and the Rock histogram is more spread out. Classical histogram has 3 outliers and the rock histogram has 1. Both of the histograms are not normal. 
+
+```{r}
+qplot(LVar, LAve, data=music.sub, color=Type, size=I(5), alpha=I(0.5)) + theme(aspect.ratio=1)
+```
+B) Classical music is less spread out and the LVar values are between 0 and 5e+07, while Rock has more variation in the LVar values. However, when looking at LAve values, Classical music is more spread out while Rock stays around 0 and -100. 
+
+```{r}
+music.sub2 <- subset(music, Type == "Rock" | Type == "Classical" | Type=="New wave")
+ggparcoord(music.sub2, columns=3:7, groupColumn="Type", 
+             title="Parallel Coordinate Plot: Music Types")
+
+```
+```{r}
+ggparcoord(music.sub2, columns=c(4, 3, 5, 6, 7),
+             groupColumn="Type", 
+             title="Parallel Coordinate Plot: Music Types")
+ggparcoord(music, columns=c(4, 3, 5, 6, 7),
+             groupColumn="Type", missing="exclude",
+             title="Parallel Coordinate Plot: Music Types")
+```
+C) Rock has more LVar and LFEner values than the rest of the music types and has the lowest LAve. Classical music has higher LFreq values and LAve values and has the lowest LMax values. New wave has mostly similar values between the variables with the lowest being in LMax. 
+
+```{r}
+ggpairs(bodyfat[,1:4])
+```
+1) The correlation between the variables are not linear but more uniform. The Height Variable has a uniform relationship with the other variables. Bodyfat and Age have a more positive relationship but it is not linear. Body fat and Wight has a moderate positive relationship with one outlier. Weight and Age do not have the best relationship since the correlation is close to 0. The same goes with Height and body fat.
+```{r}
+bf.sub <- subset(bodyfat, Heightinches > 60 & Weightlbs < 300)
+ggpairs(bf.sub[,1:4])
+
+```
+2. This plot removes the outliers for the person who is under 40 inches and and other person who weighs more than 300 pounds. This removes the outliers making the correlation between the variables stronger. Weight and Body fat has a strong positve linear relationship. Weight and Height have a moderate positive linear relationship. Height and Age have a weak negative relationship. Weight and Age has a very weak relationship almost to 0. 
+```{r}
+ggparcoord(bf.sub, 5:14)
+```
+3. There is a very high value of AnkleCircm that is over 5.0. This is considered to be an outlier and can affect the data.  
+```{r}
+summary(bf.sub$AnkleCircm)
+sort(bf.sub$AnkleCircm)
+bf.sub[bf.sub$AnkleCircm > 33,]
+```
+```{r}
+bf.sub2 <- subset(bf.sub, AnkleCircm < 33)
+ggparcoord(bf.sub2, 5:14)
+
+```
+4)By removing the outlier, the graph looks a lot more neater. There are high values in the Hip of 4, Abdomen of approximately 3 and ChestCircm of 3 and there is a low value of -3.5 for the forearmCircm. However, other than that, the values are between -3 and 3 and looks like a normal relationship. 
+
+```{r}
+pisamath2 <- subset(pisamath, !is.na(acc))
+summary(pisamath2)
+ggpairs(pisamath2, mapping=aes(color=Gender, alpha=0.5))
+
+```
+1. There is 4978 NAs of acc variable.
+2.There is a very strong correlation between the all the variables between the Genders since the correlation values are between .892 and .935 which is considered as a strong linear relationship. 

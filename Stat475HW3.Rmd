@@ -1,0 +1,102 @@
+---
+title: "HW3Stat475"
+output: html_document
+date: '2022-11-15'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+cork <- read.csv("cork.csv")
+corkV <- cork[,2:5]
+head(cork)
+m <- colMeans(corkV)
+m
+boxplot(corkV)
+cov.cork <- cov(corkV)
+cov.cork
+cor(corkV)
+qqnorm(cork$X1_North)
+qqnorm(cork$X2_East)
+qqnorm(cork$X3_South)
+qqnorm(cork$X4_West)
+
+```
+
+
+```{r}
+boxplot(corkV)
+```
+b)The South side has a bigger range in thickness of cork values. However, the means for the corks appear to be similar. The distributions of each region appear to be right skewed by the boxplots. 
+c) According to the correlation matrix, South and West have the highest corelation, while East and West have the lowest. 
+```{r}
+cor(corkV)
+library(GGally)
+ggpairs(corkV)
+```
+
+Univariate Shapiro Test 
+```{r}
+apply(corkV, 2, shapiro.test)
+```
+Multivariate Test 
+```{r}
+library(mvShapiroTest)
+mvShapiro.Test(as.matrix(cork[,2:5]))
+```
+
+e) The p-value for the test is 0.001. We can reject the null hypothesis that the mean vector is equal to 47 for all variables.
+```{r}
+library(DescTools)
+HotellingsT2Test(corkV,mu =c(47,47,47,47), test = "f" )
+```
+f) The p-value is really small. This means we can reject the null hypothesis that the means are all equal to each other.
+```{r}
+HotellingsT2Test(corkV, test = "f" )
+```
+
+e)
+```{r}
+n <- nrow(corkV)
+dim(corkV)
+p <- ncol(corkV)
+cov.corkV<- cov(corkV)
+##Bonferroni 
+upper_bonf <- mean(corkV[,1])- mean(corkV[,2]) + qt(1-.05/2,n-1)*sqrt(cov.corkV[1,1]-2*cov.corkV[1,2]+cov.corkV[3,2]/n)
+lower_bonf <- mean(corkV[,1])- mean(corkV[,2]) - qt(1-.05/2,n-1)*sqrt(cov.corkV[1,1]-2*cov.corkV[1,2]+cov.corkV[2,2]/n)
+print(rbind(lower_bonf, upper_bonf))
+
+upper_bonf <- mean(corkV[,1])- mean(corkV[,3]) + qt(1-.05/2,n-1)*sqrt(cov.corkV[1,1]-2*cov.corkV[1,3]+cov.corkV[3,3]/n)
+lower_bonf <- mean(corkV[,1])- mean(corkV[,3]) - qt(1-.05/2,n-1)*sqrt(cov.corkV[1,1]-2*cov.corkV[1,3]+cov.corkV[3,3]/n)
+print(rbind(lower_bonf, upper_bonf))
+
+upper_bonf <- mean(corkV[,1])- mean(corkV[,4]) + qt(1-.05/2,n-1)*sqrt(cov.corkV[1,1]-2*cov.corkV[1,4]+cov.corkV[4,4]/n)
+lower_bonf <- mean(corkV[,1])- mean(corkV[,4]) - qt(1-.05/2,n-1)*sqrt(cov.corkV[1,1]-2*cov.corkV[1,4]+cov.corkV[4,4]/n)
+print(rbind(lower_bonf, upper_bonf))
+
+upper_bonf <- mean(corkV[,2])- mean(corkV[,3]) + qt(1-.05/2,n-1)*sqrt(cov.corkV[2,2]-2*cov.corkV[2,3]+cov.corkV[3,3]/n)
+lower_bonf <- mean(corkV[,2])- mean(corkV[,3]) - qt(1-.05/2,n-1)*sqrt(cov.corkV[2,2]-2*cov.corkV[2,3]+cov.corkV[3,3]/n)
+print(rbind(lower_bonf, upper_bonf))
+
+upper_bonf <- mean(corkV[,2])- mean(corkV[,4]) + qt(1-.05/2,n-1)*sqrt(cov.corkV[2,2]-2*cov.corkV[2,4]+cov.corkV[4,4]/n)
+lower_bonf <- mean(corkV[,2])- mean(corkV[,4]) - qt(1-.05/2,n-1)*sqrt(cov.corkV[2,2]-2*cov.corkV[2,4]+cov.corkV[4,4]/n)
+print(rbind(lower_bonf, upper_bonf))
+
+upper_bonf <- mean(corkV[,3])- mean(corkV[,4]) + qt(1-.05/2,n-1)*sqrt(cov.corkV[3,3]-2*cov.corkV[3,4]+cov.corkV[4,4]/n)
+lower_bonf <- mean(corkV[,3])- mean(corkV[,4]) - qt(1-.05/2,n-1)*sqrt(cov.corkV[3,3]-2*cov.corkV[3,4]+cov.corkV[4,4]/n)
+print(rbind(lower_bonf, upper_bonf))
+
+```
+Problem 2
+```{r}
+bnotes <- read.csv("bnotes.csv")
+head(bnotes)
+dim(bnotes)
+#a)The qq plot for length is the plot that mosts falls on the line which makes it the most normal distributed variable in the data.Left_width has a curved slope which makes it look like it is not sampled from a normal distribution. Right_width and margin_wb is also curved so the same goes for this. Margin_wt and diagonal mostly fall on the line so this means that it is assumed that it is under the distribution.
+apply(bnotes[ -1], 2, shapiro.test)
+#b)The p-value reported is .024. Since this is less than .05, we can say that the sample comes from a multivariate model of 6 dimensions. 
+mvShapiro.Test(as.matrix(bnotes[ , 2:7]))
+```
+
